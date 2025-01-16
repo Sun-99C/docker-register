@@ -1,0 +1,30 @@
+name: Push Docker Image to Aliyun
+
+on:
+  push:
+    branches:
+      - main # 触发工作的分支
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v2
+
+    - name: Log in to Aliyun Container Registry
+      run: |
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_ACCOUNT }} --password-stdin registry.cn-hangzhou.aliyuncs.com
+
+    - name: Build the Docker image
+      run: |
+        docker build . -t your-docker-image-name:latest
+
+    - name: Tag the Docker image
+      run: |
+        docker tag your-docker-image-name:latest registry.cn-hangzhou.aliyuncs.com/your-repo/your-docker-image-name:latest
+
+    - name: Push the Docker image
+      run: |
+        docker push registry.cn-hangzhou.aliyuncs.com/your-repo/your-docker-image-name:latest
